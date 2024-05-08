@@ -3,7 +3,7 @@ class Room {
   
   constructor(router) {
     this.router = router;
-    this.peer = new Map();
+    this.peers = new Map();
   }
 
   static findBy(roomName) {
@@ -15,11 +15,17 @@ class Room {
   }
 
   joinPeer(peer) {
-    this.peer.set(peer.puuid, peer);
+    this.peers.set(peer.puuid, peer);
   }
 
   findPeer(puuid) {
-    this.peer.get(puuid);
+    this.peers.get(puuid);
+  }
+
+  findProducers(excludedSocketId) {
+    return Array.from(this.peers.values()).filter(
+      peer => peer.socketId !== excludedSocketId && peer.hasProducer()
+    )
   }
 }
 

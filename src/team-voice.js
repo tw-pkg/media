@@ -103,7 +103,66 @@ export default (io, socket) => {
     informNewProducer()
   })
 
-  function informNewProducer() {
-    //todo
+  function informNewProducer(room, peer) {
+    room.findProducers(peer.socketId).forEach(producer => {
+      io.to(producer.socketId).emit('new-producer', {
+        id: peer.producer.id,
+        summoner: peer.summoner
+      });
+    });
   }
+
+  socket.on('get-producers', (callback) => {
+    const room = Room.findBy(socket.roomName);
+    const producers = room.findProducers(socket.id).map(producer => {
+      return {
+        id: producer.id,
+        summoner: producer.summoner
+      }
+    });
+
+    callback(producers)
+  });
+
+  socket.on('transport-recv-connect', async (data) => {
+    const { puuid, dtlsParameters, remoteProducerId } = data;
+
+    const room = Room.findBy(socket.roomName);
+    const peer = room.findPeer(puuid);
+    const transport = peer.findConsumerTransport(remoteProducerId);
+
+    if (room.router.canConsume({ producerId: remoteProducerId, rtpCapabilities })) {
+      const consumer = await transport.consume({
+        producerId: remoteProducerId,
+        rtpCapabilities,
+        paused: true,
+      });
+
+      peer.addConsumer(remoteProducerId, consumer);
+
+      const { id, kind, rtpParameters } = consumer;
+      callback({
+        params: {
+          id,
+          producerId: remoteProducerId,
+          kind,
+          rtpParameters,
+          serverConsumerId: id
+        }
+      });
+    }
+  });
+
+  socket.on('consumer-resume', async (data) => {
+    const { puuid, remoteProducerId } = data;
+    
+    const room = Room.findBy(socket.roomName);
+    const peer = room.findPeer(puuid);
+    const consumer = peer.findConsumer(remoteProducerId);
+
+    await consumer.resume();
+  });
+
+  socket.on('disconnect', () => {
+  })
 }

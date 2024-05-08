@@ -5,6 +5,7 @@ class Peer {
     this.producerTransport = null;
     this.consumerTransports = new Map();
     this.producer = null;
+    this.consumers = new Map();
   }
 
   setProducerTransport(transport) {
@@ -21,6 +22,22 @@ class Peer {
 
   setProducer(producer) {
     this.producer = producer;
+  }
+
+  hasProducer() {
+    return this.producer !== null;
+  }
+
+  findConsumerTransport(producerId) {
+    return this.consumerTransports.get(producerId);
+  }
+
+  addConsumer(producerId, consumer) {
+    this.consumers.set(producerId, consumer);
+  }
+
+  findConsumer(producerId) {
+    return this.consumers.get(producerId);
   }
 }
 
