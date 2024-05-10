@@ -24,7 +24,7 @@ class Room {
 
   findProducers(excludedSocketId) {
     return Array.from(this.peers.values()).filter(
-      peer => peer.socketId !== excludedSocketId && peer.hasProducer()
+      peer => peer.socketId !== excludedSocketId && peer.isProducer()
     )
   }
 }

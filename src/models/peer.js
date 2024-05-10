@@ -24,7 +24,7 @@ class Peer {
     this.producer = producer;
   }
 
-  hasProducer() {
+  isProducer() {
     return this.producer !== null;
   }
 
