@@ -1,5 +1,5 @@
 import Peer from "./models/peer";
-import Room from "./models/room";
+import { Rooms, Room } from "./models/room";
 import Worker from "./worker";
 
 export default (io, socket) => {
@@ -18,7 +18,7 @@ export default (io, socket) => {
   });
 
   async function createRoom(roomName) {
-    const room = Room.findBy(roomName);
+    const room = Rooms.findBy(roomName);
 
     if (room) {
       return room;
@@ -26,7 +26,7 @@ export default (io, socket) => {
 
     const router = await Worker.createRouter();
     const newRoom = new Room(router);
-    Room.save(roomName, newRoom);
+    Rooms.save(roomName, newRoom);
     return newRoom;
   }
 

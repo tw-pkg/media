@@ -1,17 +1,19 @@
-class Room {
+class Rooms {
   static rooms = new Map();
   
-  constructor(router) {
-    this.router = router;
-    this.peers = new Map();
-  }
-
   static findBy(roomName) {
     return this.rooms.get(roomName);
   }
 
   static save(roomName, room) {
     this.rooms.set(roomName, room);
+  }
+}
+
+class Room {
+  constructor(router) {
+    this.router = router;
+    this.peers = new Map();
   }
 
   joinPeer(peer) {
@@ -29,4 +31,4 @@ class Room {
   }
 }
 
-export default Room;
+export { Rooms, Room };
