@@ -2,7 +2,7 @@ import Peer from "./models/peer";
 import { Rooms, Room } from "./models/room";
 import Worker from "./worker";
 
-export function connect(io, socket) {
+export default (io, socket) => {
   socket.on('team-join-room', async (data, callback) => {
     const { roomName, summoner } = data;
     const room = await createRoom(roomName);
@@ -179,11 +179,6 @@ export function connect(io, socket) {
     await consumer.resume();
   });
 
-  socket.on('disconnect', () => {
-  })
-}
-
-export function manageTeamVoice (io, socket) {
   socket.on('mic-visualizer', (data) => {
     io.emit('mic-visualizer', data);
   })
@@ -193,5 +188,5 @@ export function manageTeamVoice (io, socket) {
   })
 
   socket.on('disconnect', () => {
-  });
+  })
 }
