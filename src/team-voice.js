@@ -3,8 +3,11 @@ import Rooms from "./models/rooms.js";
 import Room from "./models/room.js";
 import Worker from "./worker.js";
 import log from "./logger.js";
+import dotenv from "dotenv";
 
-const LISTENIP = "172.30.1.202";
+dotenv.config();
+
+const LISTENIP = process.env.LISTENIP;
 
 export default (io, socket) => {
   socket.on("team-join-room", async (data, callback) => {
@@ -14,7 +17,7 @@ export default (io, socket) => {
     room.joinPeer(peer);
 
     socket.join(roomId);
-    log("팀보이스 입장");
+    log(puuid + " 팀보이스 입장. roomId: " + roomId);
 
     callback({
       rtpCapabilities: room.router.rtpCapabilities,
@@ -40,7 +43,7 @@ export default (io, socket) => {
     const peer = room.findPeer(socket.id);
     const transport = await createTransport(room.router);
     peer.setProducerTransport(transport);
-    log("producer transport 생성");
+    log(peer.puuid + " producer transport 생성");
 
     const { id, iceParameters, iceCandidates, dtlsParameters } = transport;
     callback({
@@ -51,16 +54,16 @@ export default (io, socket) => {
     });
   });
 
-  socket.on("create-consumer-transport", async (data) => {
+  socket.on("create-consumer-transport", async (data, callback) => {
     const { roomId, remoteProducerId } = data;
     const room = Rooms.findBy(roomId);
     const peer = room.findPeer(socket.id);
     const transport = await createTransport(room.router);
     peer.addConsumerTransport(remoteProducerId, transport);
-    log("consumer transport 생성");
+    log(peer.puuid + " consumer transport 생성");
 
     const { id, iceParameters, iceCandidates, dtlsParameters } = transport;
-    socket.emit("create-consumer-transport", {
+    callback({
       id,
       iceParameters,
       iceCandidates,
@@ -93,7 +96,7 @@ export default (io, socket) => {
     const room = Rooms.findBy(roomId);
     const peer = room.findPeer(socket.id);
     const transport = peer.findProducerTransport();
-    log("producer transport 연결");
+    log(peer.puuid + " producer transport 연결");
 
     transport.connect({ dtlsParameters });
   });
@@ -106,11 +109,11 @@ export default (io, socket) => {
 
     const producer = await transport.produce({ kind, rtpParameters });
     peer.setProducer(producer);
-    log("producer 생성");
+    log(peer.puuid + " producer 생성");
 
     const producers = room.findProducers(peer.socketId);
     informNewProducer(producers, peer);
-    log("new producer");
+    log(peer.puuid + " new producer");
 
     callback({
       id: producer.id,
@@ -136,18 +139,19 @@ export default (io, socket) => {
         puuid: producer.puuid,
       };
     });
-    log("ger producers");
+    log("get producers");
 
     callback(producers);
   });
 
   socket.on("transport-recv-connect", (data) => {
+    console.log("두번째 받음");
     const { roomId, dtlsParameters, remoteProducerId } = data;
 
     const room = Rooms.findBy(roomId);
     const peer = room.findPeer(socket.id);
     const transport = peer.findConsumerTransport(remoteProducerId);
-    log("receive transport 연결");
+    log(peer.puuid + " consumer transport 연결");
 
     transport.connect({ dtlsParameters });
   });
@@ -169,7 +173,7 @@ export default (io, socket) => {
       });
 
       peer.addConsumer(remoteProducerId, consumer);
-      log("consumer 생성");
+      log(peer.puuid + " consumer 생성");
 
       const { id, kind, rtpParameters } = consumer;
       callback({
@@ -190,7 +194,7 @@ export default (io, socket) => {
     const room = Rooms.findBy(roomId);
     const peer = room.findPeer(socket.id);
     const consumer = peer.findConsumer(remoteProducerId);
-    log("consumer resume");
+    log(peer.puuid + " consumer resume");
 
     await consumer.resume();
   });
@@ -204,7 +208,6 @@ export default (io, socket) => {
   });
 
   socket.on("disconnect", () => {
-    log("peer 연결종료");
     const room = Rooms.findBySocketId(socket.id);
 
     if (room) {
@@ -216,6 +219,7 @@ export default (io, socket) => {
 
       room.leavePeer(peer);
       peer.closeAll();
+      log(peer.puuid + " 연결종료");
     }
 
     Rooms.remove(room);

@@ -1,3 +1,5 @@
+import log from "../logger.js";
+
 class Rooms {
   static rooms = new Map();
 
@@ -19,6 +21,7 @@ class Rooms {
     if (room.isEmpty()) {
       room.remove();
       this.rooms.delete(room.id);
+      log("방 폭파");
     }
   }
 }
