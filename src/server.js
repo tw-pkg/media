@@ -5,7 +5,7 @@ import socket from './socket.js';
 import Worker from './worker.js';
 
 const app = express();
-const port = 8080;
+const port = 8090;
 app.use(cors());
 
 const server = createServer(app);
