@@ -4,6 +4,8 @@ import Room from "./models/room.js";
 import Worker from "./worker.js";
 import log from "./logger.js";
 
+const LISTENIP = "";
+
 export default (io, socket) => {
   socket.on("team-join-room", async (data, callback) => {
     const { roomId, puuid } = data;
