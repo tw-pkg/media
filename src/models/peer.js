@@ -1,5 +1,3 @@
-import socket from "../socket.js";
-
 class Peer {
   constructor(socketId, puuid) {
     this.socketId = socketId;
