@@ -27,15 +27,11 @@ class Room {
         .filter(peer => peer.socketId !== disconnectedPeer.socketId)
         .forEach((peer) => {
           const consumer = peer.findConsumer(disconnectedPeer.producer.id);
-          if(consumer) {
-            consumer.close();
-          }
+          consumer?.close();
           peer.deleteConsumer(disconnectedPeer.producer.id);
 
           const consumerTransport = peer.findConsumerTransport(disconnectedPeer.producer.id);
-          if(consumerTransport) {
-            consumerTransport.close();
-          }
+          consumerTransport?.close();
           peer.deleteConsumerTransport(disconnectedPeer.producer.id);
     });
 
