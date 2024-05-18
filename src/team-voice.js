@@ -4,7 +4,7 @@ import Room from "./models/room.js";
 import Worker from "./worker.js";
 import log from "./logger.js";
 
-const LISTENIP = "";
+const LISTENIP = "172.30.1.202";
 
 export default (io, socket) => {
   socket.on("team-join-room", async (data, callback) => {
@@ -218,6 +218,6 @@ export default (io, socket) => {
       peer.closeAll();
     }
 
-    Rooms.remove();
+    Rooms.remove(room);
   });
 };
