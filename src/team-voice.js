@@ -5,20 +5,20 @@ import Worker from "./worker.js";
 
 export default (io, socket) => {
   socket.on('team-join-room', async (data, callback) => {
-    const { roomName, puuid } = data;
-    const room = await createRoom(roomName);
+    const { roomId, puuid } = data;
+    const room = await createRoom(roomId);
     const peer = new Peer(socket.id, puuid);
     room.joinPeer(peer);
 
-    socket.join(roomName);
+    socket.join(roomId);
 
     callback({
       rtpCapabilities: room.router.rtpCapabilities
     });
   });
 
-  async function createRoom(roomName) {
-    const room = Rooms.findBy(roomName);
+  async function createRoom(roomId) {
+    const room = Rooms.findBy(roomId);
 
     if (room) {
       return room;
@@ -26,13 +26,13 @@ export default (io, socket) => {
 
     const router = await Worker.createRouter();
     const newRoom = new Room(router);
-    Rooms.save(roomName, newRoom);
+    Rooms.save(roomId, newRoom);
     return newRoom;
   }
 
   socket.on('create-producer-transport', async (data, callback) => {
-    const { roomName } = data;
-    const room = Rooms.findBy(roomName);
+    const { roomId } = data;
+    const room = Rooms.findBy(roomId);
     const peer = room.findPeer(socket.id);
     const transport = await createTransport(room.router);
     peer.setProducerTransport(transport);
@@ -47,8 +47,8 @@ export default (io, socket) => {
   });
 
   socket.on('create-consumer-transport', async (data) => {
-    const { roomName, remoteProducerId } = data;
-    const room = Rooms.findBy(roomName);
+    const { roomId, remoteProducerId } = data;
+    const room = Rooms.findBy(roomId);
     const peer = room.findPeer(socket.id);
     const transport = await createTransport(room.router);
     peer.addConsumerTransport(remoteProducerId, transport);
@@ -83,8 +83,8 @@ export default (io, socket) => {
   }
 
   socket.on('transport-connect', (data) => {
-    const { roomName, dtlsParameters } = data;
-    const room = Rooms.findBy(roomName);
+    const { roomId, dtlsParameters } = data;
+    const room = Rooms.findBy(roomId);
     const peer = room.findPeer(socket.id);
     const transport = peer.findProducerTransport();
 
@@ -92,8 +92,8 @@ export default (io, socket) => {
   });
 
   socket.on('transport-produce', async (data, callback) => {
-    const { roomName, kind, rtpParameters } = data;
-    const room = Rooms.findBy(roomName);
+    const { roomId, kind, rtpParameters } = data;
+    const room = Rooms.findBy(roomId);
     const peer = room.findPeer(socket.id);
     const transport = peer.findProducerTransport();
 
@@ -119,8 +119,8 @@ export default (io, socket) => {
   }
 
   socket.on('get-producers', (data, callback) => {
-    const { roomName } = data;
-    const room = Rooms.findBy(roomName);
+    const { roomId } = data;
+    const room = Rooms.findBy(roomId);
     const producers = room.findProducers(socket.id).map(producer => {
       return {
         id: producer.id,
@@ -132,9 +132,9 @@ export default (io, socket) => {
   });
 
   socket.on('transport-recv-connect', (data) => {
-    const { roomName, dtlsParameters, remoteProducerId } = data;
+    const { roomId, dtlsParameters, remoteProducerId } = data;
 
-    const room = Rooms.findBy(roomName);
+    const room = Rooms.findBy(roomId);
     const peer = room.findPeer(socket.id);
     const transport = peer.findConsumerTransport(remoteProducerId);
 
@@ -142,9 +142,9 @@ export default (io, socket) => {
   });
 
   socket.on('consume', async (data, callback) => {
-    const { roomName, rtpCapabilities, remoteProducerId } = data;
+    const { roomId, rtpCapabilities, remoteProducerId } = data;
 
-    const room = Rooms.findBy(roomName);
+    const room = Rooms.findBy(roomId);
     const peer = room.findPeer(socket.id);
     const transport = peer.findConsumerTransport(remoteProducerId);
 
@@ -171,9 +171,9 @@ export default (io, socket) => {
   })
 
   socket.on('consumer-resume', async (data) => {
-    const { roomName, remoteProducerId } = data;
+    const { roomId, remoteProducerId } = data;
     
-    const room = Rooms.findBy(roomName);
+    const room = Rooms.findBy(roomId);
     const peer = room.findPeer(socket.id);
     const consumer = peer.findConsumer(remoteProducerId);
 

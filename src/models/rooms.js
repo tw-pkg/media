@@ -1,12 +1,12 @@
 class Rooms {
     static rooms = new Map();
 
-    static findBy(roomName) {
-        return this.rooms.get(roomName);
+    static findBy(roomId) {
+        return this.rooms.get(roomId);
     }
 
-    static save(roomName, room) {
-        this.rooms.set(roomName, room);
+    static save(roomId, room) {
+        this.rooms.set(roomId, room);
     }
 }
 
