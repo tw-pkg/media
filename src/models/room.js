@@ -5,11 +5,11 @@ class Room {
   }
 
   joinPeer(peer) {
-    this.peers.set(peer.puuid, peer);
+    this.peers.set(peer.socketId, peer);
   }
 
-  findPeer(puuid) {
-    this.peers.get(puuid);
+  findPeer(socketId) {
+    return this.peers.get(socketId);
   }
 
   findProducers(excludedSocketId) {

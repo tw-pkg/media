@@ -1,7 +1,7 @@
 class Peer {
-  constructor(socketId, summoner) {
+  constructor(socketId, puuid) {
     this.socketId = socketId;
-    this.puuid = summoner.puuid;
+    this.puuid = puuid
     this.producerTransport = null;
     this.consumerTransports = new Map();
     this.producer = null;
