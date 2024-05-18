@@ -1,6 +1,7 @@
-import Peer from "./models/peer";
-import { Rooms, Room } from "./models/room";
-import Worker from "./worker";
+import Peer from "./models/peer.js";
+import Rooms from "./models/rooms.js";
+import Room from "./models/room.js";
+import Worker from "./worker.js";
 
 export default (io, socket) => {
   socket.on('team-join-room', async (data, callback) => {

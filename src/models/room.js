@@ -1,15 +1,3 @@
-class Rooms {
-  static rooms = new Map();
-  
-  static findBy(roomName) {
-    return this.rooms.get(roomName);
-  }
-
-  static save(roomName, room) {
-    this.rooms.set(roomName, room);
-  }
-}
-
 class Room {
   constructor(router) {
     this.router = router;
@@ -31,4 +19,4 @@ class Room {
   }
 }
 
-export { Rooms, Room };
+export default Room
