@@ -1,5 +1,6 @@
 class Room {
-  constructor(router) {
+  constructor(roomId, router) {
+    this.id = roomId;
     this.router = router;
     this.peers = new Map();
   }
@@ -14,8 +15,8 @@ class Room {
 
   findProducers(excludedSocketId) {
     return Array.from(this.peers.values()).filter(
-      peer => peer.socketId !== excludedSocketId && peer.isProducer()
-    )
+      (peer) => peer.socketId !== excludedSocketId && peer.isProducer(),
+    );
   }
 
   hasPeer(socketId) {
@@ -24,19 +25,29 @@ class Room {
 
   leavePeer(disconnectedPeer) {
     Array.from(this.peers.values())
-        .filter(peer => peer.socketId !== disconnectedPeer.socketId)
-        .forEach((peer) => {
-          const consumer = peer.findConsumer(disconnectedPeer.producer.id);
-          consumer?.close();
-          peer.deleteConsumer(disconnectedPeer.producer.id);
+      .filter((peer) => peer.isSame(disconnectedPeer.socketId))
+      .forEach((peer) => {
+        const consumer = peer.findConsumer(disconnectedPeer.producer.id);
+        consumer?.close();
+        peer.deleteConsumer(disconnectedPeer.producer.id);
 
-          const consumerTransport = peer.findConsumerTransport(disconnectedPeer.producer.id);
-          consumerTransport?.close();
-          peer.deleteConsumerTransport(disconnectedPeer.producer.id);
-    });
+        const consumerTransport = peer.findConsumerTransport(
+          disconnectedPeer.producer.id,
+        );
+        consumerTransport?.close();
+        peer.deleteConsumerTransport(disconnectedPeer.producer.id);
+      });
 
     this.peers.delete(disconnectedPeer.socketId);
   }
+
+  isEmpty() {
+    return this.peers.size === 0;
+  }
+
+  remove() {
+    this.router.close();
+  }
 }
 
-export default Room
+export default Room;

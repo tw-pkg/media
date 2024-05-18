@@ -1,11 +1,17 @@
+import socket from "../socket.js";
+
 class Peer {
   constructor(socketId, puuid) {
     this.socketId = socketId;
-    this.puuid = puuid
+    this.puuid = puuid;
     this.producerTransport = null;
     this.consumerTransports = new Map();
     this.producer = null;
     this.consumers = new Map();
+  }
+
+  isSame(socketId) {
+    return this.socketId === socketId;
   }
 
   setProducerTransport(transport) {
@@ -51,8 +57,10 @@ class Peer {
   closeAll() {
     this.producer?.close();
     this.producerTransport?.close();
-    Array.from(this.consumers.values()).forEach(consumer => consumer.close());
-    Array.from(this.consumerTransports.values()).forEach(transport => transport.close());
+    Array.from(this.consumers.values()).forEach((consumer) => consumer.close());
+    Array.from(this.consumerTransports.values()).forEach((transport) =>
+      transport.close(),
+    );
   }
 }
 

@@ -1,13 +1,13 @@
-import mediasoup from 'mediasoup';
+import mediasoup from "mediasoup";
 
 const mediaCodecs = [
   {
-    kind: 'audio',
-    mimeType: 'audio/opus',
+    kind: "audio",
+    mimeType: "audio/opus",
     clockRate: 48000,
     channels: 2,
   },
-]
+];
 
 class Worker {
   static worker;
@@ -18,7 +18,7 @@ class Worker {
       rtcMaxPort: 2100,
     });
 
-    this.worker.on('died', (err) => {
+    this.worker.on("died", (err) => {
       console.error(err);
     });
   }
