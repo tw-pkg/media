@@ -189,5 +189,17 @@ export default (io, socket) => {
   })
 
   socket.on('disconnect', () => {
+    const room = Rooms.findBySocketId(socket.id);
+
+    if(room) {
+      const peer = room.findPeer(socket.id);
+
+      socket.broadcast.emit('inform-exit-in-game', {
+        puuid: peer.puuid
+      })
+
+      room.leavePeer(peer);
+      peer.closeAll();
+    }
   })
 }

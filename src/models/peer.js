@@ -39,6 +39,21 @@ class Peer {
   findConsumer(producerId) {
     return this.consumers.get(producerId);
   }
+
+  deleteConsumer(producerId) {
+    this.consumers.delete(producerId);
+  }
+
+  deleteConsumerTransport(producerId) {
+    this.consumerTransports.delete(producerId);
+  }
+
+  closeAll() {
+    this.producer?.close();
+    this.producerTransport?.close();
+    Array.from(this.consumers.values()).forEach(consumer => consumer.close());
+    Array.from(this.consumerTransports.values()).forEach(transport => transport.close());
+  }
 }
 
 export default Peer;
