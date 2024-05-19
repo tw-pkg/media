@@ -133,10 +133,10 @@ export default (io, socket) => {
   socket.on("get-producers", (data, callback) => {
     const { roomId } = data;
     const room = Rooms.findBy(roomId);
-    const producers = room.findProducers(socket.id).map((producer) => {
+    const producers = room.findProducers(socket.id).map((peer) => {
       return {
-        id: producer.producer.id,
-        puuid: producer.puuid,
+        id: peer.producer.id,
+        puuid: peer.puuid,
       };
     });
     log("get producers");
