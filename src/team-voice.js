@@ -17,7 +17,7 @@ export default (io, socket) => {
     room.joinPeer(peer);
 
     socket.join(roomId);
-    log(puuid + " 팀보이스 입장. roomId: " + roomId);
+    log(`${puuid} 팀보이스 입장`);
 
     callback({
       rtpCapabilities: room.router.rtpCapabilities,
@@ -43,7 +43,7 @@ export default (io, socket) => {
     const peer = room.findPeer(socket.id);
     const transport = await createTransport(room.router);
     peer.setProducerTransport(transport);
-    log(peer.puuid + " producer transport 생성");
+    log(`${peer.puuid} producer transport 생성`);
 
     const { id, iceParameters, iceCandidates, dtlsParameters } = transport;
     callback({
@@ -60,7 +60,7 @@ export default (io, socket) => {
     const peer = room.findPeer(socket.id);
     const transport = await createTransport(room.router);
     peer.addConsumerTransport(remoteProducerId, transport);
-    log(peer.puuid + " consumer transport 생성");
+    log(`${peer.puuid} consumer transport 생성`);
 
     const { id, iceParameters, iceCandidates, dtlsParameters } = transport;
     callback({
@@ -91,14 +91,14 @@ export default (io, socket) => {
     }
   }
 
-  socket.on("transport-connect", (data) => {
+  socket.on("transport-connect", async (data) => {
     const { roomId, dtlsParameters } = data;
     const room = Rooms.findBy(roomId);
     const peer = room.findPeer(socket.id);
     const transport = peer.findProducerTransport();
-    log(peer.puuid + " producer transport 연결");
+    log(`${peer.puuid} producer transport 연결`);
 
-    transport.connect({ dtlsParameters });
+    await transport.connect({ dtlsParameters });
   });
 
   socket.on("transport-produce", async (data, callback) => {
@@ -109,11 +109,11 @@ export default (io, socket) => {
 
     const producer = await transport.produce({ kind, rtpParameters });
     peer.setProducer(producer);
-    log(peer.puuid + " producer 생성");
+    log(`${peer.puuid} producer 생성`);
 
     const producers = room.findProducers(peer.socketId);
     informNewProducer(producers, peer);
-    log(peer.puuid + " new producer");
+    log(`${peer.puuid} inform new producer`);
 
     callback({
       id: producer.id,
@@ -144,16 +144,15 @@ export default (io, socket) => {
     callback(producers);
   });
 
-  socket.on("transport-recv-connect", (data) => {
-    console.log("두번째 받음");
+  socket.on("transport-recv-connect", async (data) => {
     const { roomId, dtlsParameters, remoteProducerId } = data;
 
     const room = Rooms.findBy(roomId);
     const peer = room.findPeer(socket.id);
     const transport = peer.findConsumerTransport(remoteProducerId);
-    log(peer.puuid + " consumer transport 연결");
+    log(`${peer.puuid} consumer transport 연결`);
 
-    transport.connect({ dtlsParameters });
+    await transport.connect({ dtlsParameters });
   });
 
   socket.on("consume", async (data, callback) => {
@@ -173,7 +172,7 @@ export default (io, socket) => {
       });
 
       peer.addConsumer(remoteProducerId, consumer);
-      log(peer.puuid + " consumer 생성");
+      log(`${peer.puuid} consumer 생성`);
 
       const { id, kind, rtpParameters } = consumer;
       callback({
@@ -219,7 +218,7 @@ export default (io, socket) => {
 
       room.leavePeer(peer);
       peer.closeAll();
-      log(peer.puuid + " 연결종료");
+      log(`${peer.puuid} 연결종료`);
     }
 
     Rooms.remove(room);
