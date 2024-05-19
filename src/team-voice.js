@@ -135,7 +135,7 @@ export default (io, socket) => {
     const room = Rooms.findBy(roomId);
     const producers = room.findProducers(socket.id).map((producer) => {
       return {
-        id: producer.id,
+        id: producer.producer.id,
         puuid: producer.puuid,
       };
     });
