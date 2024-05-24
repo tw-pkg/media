@@ -18,7 +18,7 @@ class Rooms {
   }
 
   static remove(room) {
-    if (room.isEmpty()) {
+    if (room?.isEmpty()) {
       room.remove();
       this.rooms.delete(room.id);
       log("방 폭파");
