@@ -3,11 +3,12 @@ import Rooms from "./models/rooms.js";
 import Room from "./models/room.js";
 import Worker from "./worker.js";
 import log from "./logger.js";
-import dotenv from "dotenv";
+import init from "./initializer.js";
 
-dotenv.config();
+init();
 
-const LISTENIP = process.env.LISTENIP;
+const IP = process.env.IP;
+const ANNOUNCED_IP = process.env.ANNOUNCED_IP;
 
 export default (io, socket) => {
   socket.on("team-join-room", async (data, callback) => {
@@ -75,8 +76,8 @@ export default (io, socket) => {
     const options = {
       listenIps: [
         {
-          ip: LISTENIP,
-          announcedIp: null,
+          ip: IP,
+          announcedIp: ANNOUNCED_IP,
         },
       ],
       enableUdp: true,
