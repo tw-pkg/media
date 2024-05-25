@@ -82,6 +82,8 @@ export default (io, socket) => {
       enableUdp: true,
       enableTcp: true,
       preferUdp: true,
+      rtcMinPort: 40000,
+      rtcMaxPort: 49999,
     };
 
     try {
