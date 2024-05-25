@@ -14,8 +14,8 @@ class Worker {
 
   static async init() {
     this.worker = await mediasoup.createWorker({
-      rtcMinPort: 2000,
-      rtcMaxPort: 2100,
+      rtcMinPort: 40000,
+      rtcMaxPort: 49999,
     });
 
     this.worker.on("died", (err) => {
